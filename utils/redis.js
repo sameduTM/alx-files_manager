@@ -18,7 +18,7 @@ class RedisClient {
     this.client.on('connect', () => {
       this.isConnected = true;
     });
-  
+
     this.client.on('end', () => {
       this.isConnected = false;
     });
@@ -26,7 +26,6 @@ class RedisClient {
     this.client.get = promisify(this.client.get).bind(this.client);
     this.client.set = promisify(this.client.setex).bind(this.client);
     this.client.del = promisify(this.client.del).bind(this.client);
-
   }
 
   isAlive() {
