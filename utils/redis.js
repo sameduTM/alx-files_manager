@@ -23,8 +23,9 @@ class RedisClient {
       this.isConnected = false;
     });
 
+    // Promisify the actual redis callback methods we intend to use
     this.client.get = promisify(this.client.get).bind(this.client);
-    this.client.set = promisify(this.client.setex).bind(this.client);
+    this.client.setex = promisify(this.client.setex).bind(this.client);
     this.client.del = promisify(this.client.del).bind(this.client);
   }
 
