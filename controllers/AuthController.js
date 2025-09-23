@@ -6,37 +6,29 @@ import redisClient from '../utils/redis';
 class AuthController {
   static async getConnect(request, response) {
     const baseAuth = request.get('Authorization');
-
-    // Remove the basic prefix
     const encodedLogins = baseAuth.split('Basic ')[1];
-
-    // Decode from base64
     const decodedLogins = Buffer.from(encodedLogins, 'base64').toString('utf8');
-
-    // Split into email and password
     const colonIndex = decodedLogins.indexOf(':');
     const email = decodedLogins.substring(0, colonIndex);
     const password = decodedLogins.substring(colonIndex + 1);
 
-    // checks if user exists
     const user = await dbClient.getUser(email);
     const hashedPassword = createHash('sha1').update(password).digest('hex');
 
-    if (user) {
-      if (user.password !== hashedPassword) {
-        response.status(401).json({ error: 'Unauthorized' });
-      }
-      const token = uuidv4();
-      const key = `auth_${token}`;
-
-      // Storing in redis
-      await redisClient.set(key, user._id, 24 * 3600);
-
-      response.set('X-Token', token.toString());
-      response.status(200).json({ token });
-    } else {
-      response.status(401).json({ error: 'Unauthorized' })
+    // Early returns for error cases
+    if (!user || user.password !== hashedPassword) {
+      return response.status(401).json({ error: 'Unauthorized' });
     }
+
+    // Success case
+    const token = uuidv4();
+    const key = `auth_${token}`;
+
+    await redisClient.set(key, user._id, 24 * 3600);
+
+    response.set('X-Token', token);
+
+    return response.status(200).json({ token });
   }
 
   static async getDisconnect(request, response) {
