@@ -1,8 +1,7 @@
 import { createHash } from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
-import dbClient from '../utils/db.js';
-import redisClient from '../utils/redis.js';
-import { response } from 'express';
+import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 class AuthController {
   static async getConnect(request, response) {
@@ -34,7 +33,7 @@ class AuthController {
     await redisClient.set(key, user._id, 24 * 3600);
 
     response.set('X-Token', token.toString());
-    response.status(200).json({ token })
+    response.status(200).json({ token });
   }
 
   static async getDisconnect(request, response) {
@@ -59,7 +58,7 @@ class AuthController {
       const users = await dbClient.getAllUsers();
       for (const user of users) {
         if (user._id.toString() === userId) {
-          response.status(200).json({ 'id': userId, 'email': user.email });
+          response.status(200).json({ id: userId, email: user.email });
         }
       }
     }
