@@ -22,18 +22,21 @@ class AuthController {
     const user = await dbClient.getUser(email);
     const hashedPassword = createHash('sha1').update(password).digest('hex');
 
-    if (!user || user.password !== hashedPassword) {
-      response.status(401).json({ error: 'Unauthorized' });
+    if (user) {
+      if (user.password !== hashedPassword) {
+        response.status(401).json({ error: 'Unauthorized' });
+      }
+      const token = uuidv4();
+      const key = `auth_${token}`;
+
+      // Storing in redis
+      await redisClient.set(key, user._id, 24 * 3600);
+
+      response.set('X-Token', token.toString());
+      response.status(200).json({ token });
+    } else {
+      response.status(401).json({ error: 'Unauthorized' })
     }
-
-    const token = uuidv4();
-    const key = `auth_${token}`;
-
-    // Storing in redis
-    await redisClient.set(key, user._id, 24 * 3600);
-
-    response.set('X-Token', token.toString());
-    response.status(200).json({ token });
   }
 
   static async getDisconnect(request, response) {
