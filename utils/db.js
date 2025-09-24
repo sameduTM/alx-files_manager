@@ -45,12 +45,16 @@ class DBClient {
   }
 
   async getFileById(parentId) {
-    const file = this.db.collection('files').find({ _id: ObjectId(parentId) }).toArray();
-    return file;
+    try {
+      const file = this.db.collection('files').find({ _id: ObjectId(parentId) }).toArray();
+      return file;
+    } catch (err) {
+      return null;
+    }
   }
 
   async getUser(email) {
-    const user = await this.db.collection('users').findOne({ email })
+    const user = await this.db.collection('users').findOne({ email });
     return user;
   }
 
