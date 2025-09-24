@@ -39,6 +39,11 @@ class DBClient {
     return users;
   }
 
+  async getAllFiles() {
+    const files = this.db.collection('files').find({}).toArray();
+    return files;
+  }
+
   async getUser(email) {
     const user = await this.db.collection('users').findOne({ email })
     return user;
@@ -47,6 +52,11 @@ class DBClient {
   async createUser(email, password) {
     const user = await this.db.collection('users').insertOne({ email, password });
     return user;
+  }
+
+  async createFile(obj) {
+    const file = await this.db.collection('files').insertOne(obj);
+    return file;
   }
 }
 
