@@ -1,6 +1,6 @@
 import pkg from 'mongodb';
 
-const { MongoClient } = pkg;
+const { MongoClient, ObjectId } = pkg;
 
 class DBClient {
   constructor() {
@@ -42,6 +42,11 @@ class DBClient {
   async getAllFiles() {
     const files = this.db.collection('files').find({}).toArray();
     return files;
+  }
+
+  async getFileById(parentId) {
+    const file = this.db.collection('files').find({ _id: ObjectId(parentId) }).toArray();
+    return file;
   }
 
   async getUser(email) {
