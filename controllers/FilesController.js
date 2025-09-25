@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, validate as isValidUUID } from 'uuid';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
@@ -26,9 +26,11 @@ class FilesController {
     if (!data && type !== 'folder') {
       return response.status(400).json({ error: 'Missing data' });
     }
+
     if (parentId) {
       const file = await dbClient.getFileById(parentId);
-      if (!file) {
+
+      if (!isValidUUID(parentId) || !file[0]) {
         return response.status(400).json({ error: 'Parent not found' });
       }
       if (file[0].type !== 'folder') {
