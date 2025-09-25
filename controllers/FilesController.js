@@ -26,7 +26,6 @@ class FilesController {
     if (!data && type !== 'folder') {
       return response.status(400).json({ error: 'Missing data' });
     }
-
     if (parentId) {
       const file = await dbClient.getFileById(parentId);
 
@@ -37,6 +36,7 @@ class FilesController {
         return response.status(400).json({ error: 'Parent is not a folder' });
       }
     }
+
     if (type === 'folder') {
       const obj = {
         userId: new ObjectId(userId),
