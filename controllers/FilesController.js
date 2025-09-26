@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
-import { ObjectId } from 'mongodb';
+import { ObjectID } from 'mongodb';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
@@ -39,11 +39,11 @@ class FilesController {
 
     if (type === 'folder') {
       const obj = {
-        userId: new ObjectId(userId),
+        userId: new ObjectID(userId),
         name,
         type,
         isPublic: isPublic || false,
-        parentId: ObjectId(parentId) || 0,
+        parentId: new ObjectID(parentId) || 0,
       };
       const doc = await dbClient.createFile(obj);
       const newFileAttr = {
@@ -69,11 +69,11 @@ class FilesController {
     writeFileSync(localPath, decodedData);
 
     const fileAttributes = {
-      userId: new ObjectId(userId),
+      userId: new ObjectID(userId),
       name,
       type,
-      isPublic: request.body.isPublic || false,
-      parentId: ObjectId(parentId) || 0,
+      isPublic: isPublic || false,
+      parentId: new ObjectID(parentId) || 0,
       localPath,
     };
     const fileDoc = await dbClient.createFile(fileAttributes);
