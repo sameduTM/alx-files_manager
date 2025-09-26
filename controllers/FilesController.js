@@ -14,7 +14,7 @@ class FilesController {
     }
 
     const {
-      name, type, parentId, data,
+      name, type, parentId, data, isPublic,
     } = request.body;
 
     if (!name) {
@@ -42,7 +42,7 @@ class FilesController {
         userId: new ObjectId(userId),
         name,
         type,
-        isPublic: false,
+        isPublic: isPublic || false,
         parentId: ObjectId(parentId) || 0,
       };
       const doc = await dbClient.createFile(obj);
