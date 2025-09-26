@@ -43,7 +43,7 @@ class FilesController {
         name,
         type,
         isPublic: false,
-        parentId: parentId || 0,
+        parentId: ObjectId(parentId) || 0,
       };
       const doc = await dbClient.createFile(obj);
       const newFileAttr = {
@@ -73,7 +73,7 @@ class FilesController {
       name,
       type,
       isPublic: request.body.isPublic || false,
-      parentId: request.body.parentId || 0,
+      parentId: ObjectId(parentId) || 0,
       localPath,
     };
     const fileDoc = await dbClient.createFile(fileAttributes);
