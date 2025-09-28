@@ -38,7 +38,7 @@ class FilesController {
       if (!file[0]) {
         return response.status(400).json({ error: 'Parent not found' });
       }
-      if (file[0] && type !== 'folder') {
+      if (file[0] && file[0].type !== 'folder') {
         return response.status(400).json({ error: 'Parent is not a folder' });
       }
       parentId = ObjectId(parentId);
