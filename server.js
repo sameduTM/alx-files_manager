@@ -1,4 +1,5 @@
 import express from 'express';
+
 import allRoutes from './routes/index';
 
 const app = express();
