@@ -162,49 +162,55 @@ class FilesController {
 
   static async putPublish(request, response) {
     const userToken = request.get('X-Token');
+    const fileId = request.params.id;
     const userId = redisClient.get(`auth_${userToken}`);
 
     if (!userId) {
       return response.status(401).json({ error: 'Unauthorized' });
     }
-    const userFiles = await dbClient.getFilesByUserId(userId);
+    let userFile = await dbClient.getFileByFileId(fileId);
 
-    if (userFiles.length === 0) {
+    if (userFile.length === 0) {
       return response.status(404).json({ error: 'Not found' });
     }
 
-    const result = await dbClient.updateFileByUserId(userId, true);
+    await dbClient.updateFileByUserId(fileId, true);
+
+    userFile = await dbClient.getFileByFileId(fileId);
 
     return response.status(200).json({
-      id: result._id,
-      name: result.name,
-      type: result.type,
-      isPublic: result.isPublic,
-      parentId: result.parentId,
+      id: userFile[0]._id,
+      name: userFile[0].name,
+      type: userFile[0].type,
+      isPublic: userFile[0].isPublic,
+      parentId: userFile[0].parentId,
     });
   }
 
   static async putUnpublish(request, response) {
     const userToken = request.get('X-Token');
+    const fileId = request.params.id;
     const userId = redisClient.get(`auth_${userToken}`);
 
     if (!userId) {
       return response.status(401).json({ error: 'Unauthorized' });
     }
-    const userFiles = await dbClient.getFilesByUserId(userId);
+    let userFile = await dbClient.getFileByFileId(fileId);
 
-    if (userFiles.length === 0) {
+    if (userFile.length === 0) {
       return response.status(404).json({ error: 'Not found' });
     }
 
-    const result = await dbClient.updateFileByUserId(userId, false);
+    await dbClient.updateFileByUserId(fileId, false);
+
+    userFile = await dbClient.getFileByFileId(fileId);
 
     return response.status(200).json({
-      id: result._id,
-      name: result.name,
-      type: result.type,
-      isPublic: result.isPublic,
-      parentId: result.parentId,
+      id: userFile[0]._id,
+      name: userFile[0].name,
+      type: userFile[0].type,
+      isPublic: userFile[0].isPublic,
+      parentId: userFile[0].parentId,
     });
   }
 }
