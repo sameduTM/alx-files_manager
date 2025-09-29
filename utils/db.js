@@ -109,6 +109,17 @@ class DBClient {
 
     return files;
   }
+
+  async updateFileByUserId(userId, isPublic) {
+    const filter = { userId };
+    const updateDocument = {
+      $set: {
+        isPublic,
+      },
+    };
+    const result = await this.db.collection('files').updateOne(filter, updateDocument);
+    return result;
+  }
 }
 
 const dbClient = new DBClient();
