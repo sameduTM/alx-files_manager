@@ -68,16 +68,45 @@ class DBClient {
     return file;
   }
 
-  async getAllFilesById(parentId) {
-    const files = this.db.collection('files').aggregate([
+  async getAllFilesById(parentId, page = 0, pageSize = 20) {
+    // page is 0-based (page=0 => first page)
+    const pageNum = Number(page);
+    const pageIndex = Number.isNaN(pageNum) ? 0 : pageNum;
+    const size = Math.min(Number(pageSize) || 20, 100);
+    const skip = pageIndex * size;
+
+    const pipeline = [
       { $match: { parentId: ObjectId(parentId) } },
-    ]).toArray();
+      { $skip: skip },
+      { $limit: size },
+    ];
+
+    const files = await this.db.collection('files').aggregate(pipeline).toArray();
 
     return files;
   }
 
-  async getFilesByParentId(parentId) {
-    const files = await this.db.collection('files').find({ parentId: ObjectId(parentId) }).toArray();
+  /**
+   * Get files for a user with pagination
+   * @param {string|ObjectId} userId
+   * @param {number} page - 1-based page number
+   * @param {number} pageSize - number of items per page
+   */
+  async getFilesByUserId(userId, page = 0, pageSize = 20) {
+    // page is 0-based (page=0 => first page)
+    const pageNum = Number(page);
+    const pageIndex = Number.isNaN(pageNum) ? 0 : pageNum;
+    const size = Math.min(Number(pageSize) || 20, 100); // cap pageSize to 100
+    const skip = pageIndex * size;
+
+    const pipeline = [
+      { $match: { userId: ObjectId(userId) } },
+      { $skip: skip },
+      { $limit: size },
+    ];
+
+    const files = await this.db.collection('files').aggregate(pipeline).toArray();
+
     return files;
   }
 }

@@ -99,7 +99,6 @@ class FilesController {
     const token = request.get('X-token');
     const fileId = request.params.id;
     const userId = await redisClient.get(`auth_${token}`);
-    console.log(userId);
 
     if (!userId) {
       return response.status(401).json({ error: 'Unauthorized' });
@@ -122,6 +121,41 @@ class FilesController {
       fileOutput.isPublic = file.isPublic;
       fileOutput.parentId = file.parentId;
     });
+
+    return response.status(200).json(fileOutput);
+  }
+
+  static async getIndex(request, response) {
+    const token = request.get('X-token');
+    // const fileId = request.params.id;
+    const userId = await redisClient.get(`auth_${token}`);
+    // parentId comes as string; use '0' to indicate root
+    const parentId = request.query.parentId || '0';
+    // page is expected as 0-based in DB client; if client passes 1 it means second page
+    const page = Number.isNaN(Number(request.query.page)) ? 0 : Number(request.query.page);
+    const pageSize = Number.isNaN(Number(request.query.pageSize))
+      ? 20
+      : Number(request.query.pageSize);
+
+    if (!userId) {
+      return response.status(401).json({ error: 'Unauthorized' });
+    }
+    // Decide which query to run: by parentId or by user
+    let files = [];
+    if (parentId && parentId !== '0') {
+      files = await dbClient.getAllFilesById(parentId, page, pageSize);
+    } else {
+      files = await dbClient.getFilesByUserId(userId, page, pageSize);
+    }
+
+    const fileOutput = files.map((file) => ({
+      id: file._id,
+      userId: file.userId,
+      name: file.name,
+      type: file.type,
+      isPublic: file.isPublic,
+      parentId: file.parentId,
+    }));
 
     return response.status(200).json(fileOutput);
   }
