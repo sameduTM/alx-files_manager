@@ -163,7 +163,7 @@ class FilesController {
   static async putPublish(request, response) {
     const userToken = request.get('X-Token');
     const fileId = request.params.id;
-    const userId = redisClient.get(`auth_${userToken}`);
+    const userId = await redisClient.get(`auth_${userToken}`);
 
     if (!userId) {
       return response.status(401).json({ error: 'Unauthorized' });
@@ -191,7 +191,7 @@ class FilesController {
   static async putUnpublish(request, response) {
     const userToken = request.get('X-Token');
     const fileId = request.params.id;
-    const userId = redisClient.get(`auth_${userToken}`);
+    const userId = await redisClient.get(`auth_${userToken}`);
 
     if (!userId) {
       return response.status(401).json({ error: 'Unauthorized' });
