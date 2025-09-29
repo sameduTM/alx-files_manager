@@ -180,6 +180,7 @@ class FilesController {
 
     return response.status(200).json({
       id: userFile[0]._id,
+      userId: userFile[0].userId,
       name: userFile[0].name,
       type: userFile[0].type,
       isPublic: userFile[0].isPublic,
@@ -207,6 +208,7 @@ class FilesController {
 
     return response.status(200).json({
       id: userFile[0]._id,
+      userId: userFile[0].userId,
       name: userFile[0].name,
       type: userFile[0].type,
       isPublic: userFile[0].isPublic,
