@@ -105,9 +105,8 @@ class FilesController {
     }
 
     const files = await dbClient.getFileById(fileId);
-    console.log(files);
 
-    if (!files[0]) {
+    if (!files[0] || files[0].userId !== userId) {
       return response.status(404).json({ error: 'Not found' });
     }
 
