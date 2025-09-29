@@ -106,9 +106,10 @@ class FilesController {
 
     const files = await dbClient.getFileById(fileId);
 
-    if (!files) {
+    if (!files[0]) {
       return response.status(404).json({ error: 'Not found' });
     }
+
     const fileOutput = {};
 
     files.forEach((file) => {
@@ -121,54 +122,6 @@ class FilesController {
     });
 
     return response.status(200).json(fileOutput);
-  }
-
-  static async getIndex(request, response) {
-    const token = request.get('X-token');
-    const userId = await redisClient.get(`auth_${token}`);
-
-    if (!userId) {
-      return response.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const parentId = request.query.parentId || 0;
-    const file = await dbClient.getFileById(parentId);
-
-    if (parentId === 0 || !file) {
-      const files = await dbClient.getAllFiles();
-      const outputList = [];
-
-      files.forEach((file) => {
-        outputList.push({
-          id: file._id,
-          userId: file.userId,
-          name: file.name,
-          type: file.type,
-          isPublic: file.isPublic,
-          parentId: file.parentId,
-        });
-      });
-
-      return response.status(200).json(outputList);
-    }
-    if (parentId) {
-      const files = await dbClient.getAllFilesById(parentId);
-      const outputList = [];
-
-      files.forEach((file) => {
-        outputList.push({
-          id: file._id,
-          userId: file.userId,
-          name: file.name,
-          type: file.type,
-          isPublic: file.isPublic,
-          parentId: file.parentId,
-        });
-      });
-      return response.status(200).json(outputList);
-    }
-
-    return response.status(200).json([]);
   }
 }
 
