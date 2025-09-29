@@ -235,11 +235,12 @@ class FilesController {
     if (file[0].type === 'folder') {
       return response.status(400).json({ error: 'A folder doesn\'t have content' });
     }
-    if (!file[0].localPath) {
+    if (!file[0].localPath || !existsSync(file[0].localPath)) {
       return response.status(404).json({ error: 'Not found' });
     }
 
     const mimeType = mime.lookup(file[0].name);
+
     response.setHeader('Content-Type', mimeType);
 
     const fileContent = readFileSync(file[0].localPath);
