@@ -170,7 +170,7 @@ class FilesController {
     }
     let userFile = await dbClient.getFileByFileId(fileId);
 
-    if (userFile.length === 0 || userFile[0].userId !== ObjectId(userId)) {
+    if (userFile.length === 0 || userFile[0].userId.toString() !== userId) {
       return response.status(404).json({ error: 'Not found' });
     }
 
@@ -198,7 +198,7 @@ class FilesController {
     }
     let userFile = await dbClient.getFileByFileId(fileId);
 
-    if (userFile.length === 0 || userFile[0].userId !== ObjectId(userId)) {
+    if (userFile.length === 0 || userFile[0].userId.toString() !== userId) {
       return response.status(404).json({ error: 'Not found' });
     }
 

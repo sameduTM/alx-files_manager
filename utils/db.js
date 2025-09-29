@@ -112,12 +112,13 @@ class DBClient {
 
   async updateFileByUserId(fileId, isPublic) {
     const filter = { _id: ObjectId(fileId) };
+    const options = { $upsert: true };
     const updateDocument = {
       $set: {
         isPublic,
       },
     };
-    await this.db.collection('files').updateOne(filter, updateDocument);
+    await this.db.collection('files').updateOne(filter, updateDocument, options);
   }
 
   async getFileByFileId(fileId) {
