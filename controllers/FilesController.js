@@ -99,12 +99,14 @@ class FilesController {
     const token = request.get('X-token');
     const fileId = request.params.id;
     const userId = await redisClient.get(`auth_${token}`);
+    console.log(userId);
 
     if (!userId) {
       return response.status(401).json({ error: 'Unauthorized' });
     }
 
     const files = await dbClient.getFileById(fileId);
+    console.log(files);
 
     if (!files[0]) {
       return response.status(404).json({ error: 'Not found' });
