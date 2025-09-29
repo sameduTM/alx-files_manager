@@ -134,7 +134,7 @@ class FilesController {
     const parentId = request.query.parentId || 0;
     const file = await dbClient.getFileById(parentId);
 
-    if (parentId === 0 || file.length === 0) {
+    if (parentId === 0 || !file) {
       const files = await dbClient.getAllFiles();
       const outputList = [];
 
@@ -168,7 +168,7 @@ class FilesController {
       return response.status(200).json(outputList);
     }
 
-    return response.status(200).json({});
+    return response.status(200).json([]);
   }
 }
 
