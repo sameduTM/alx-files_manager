@@ -67,6 +67,19 @@ class DBClient {
     const file = await this.db.collection('files').insertOne(obj);
     return file;
   }
+
+  async getAllFilesById(parentId) {
+    const files = this.db.collection('files').aggregate([
+      { $match: { parentId: ObjectId(parentId) } },
+    ]).toArray();
+
+    return files;
+  }
+
+  async getFilesByParentId(parentId) {
+    const files = await this.db.collection('files').find({ parentId: ObjectId(parentId) }).toArray();
+    return files;
+  }
 }
 
 const dbClient = new DBClient();

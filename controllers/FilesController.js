@@ -1,6 +1,7 @@
 import pkg from 'mongodb';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
+
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
@@ -92,6 +93,82 @@ class FilesController {
       isPublic: addedFile.ops[0].isPublic,
       parentId: addedFile.ops[0].parentId,
     });
+  }
+
+  static async getShow(request, response) {
+    const token = request.get('X-token');
+    const fileId = request.params.id;
+    const userId = await redisClient.get(`auth_${token}`);
+
+    if (!userId) {
+      return response.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const files = await dbClient.getFileById(fileId);
+
+    if (!files) {
+      return response.status(404).json({ error: 'Not found' });
+    }
+    const fileOutput = {};
+
+    files.forEach((file) => {
+      fileOutput.id = file._id;
+      fileOutput.userId = file.userId;
+      fileOutput.name = file.name;
+      fileOutput.type = file.type;
+      fileOutput.isPublic = file.isPublic;
+      fileOutput.parentId = file.parentId;
+    });
+
+    return response.status(200).json(fileOutput);
+  }
+
+  static async getIndex(request, response) {
+    const token = request.get('X-token');
+    const userId = await redisClient.get(`auth_${token}`);
+
+    if (!userId) {
+      return response.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const parentId = request.query.parentId || 0;
+    const file = await dbClient.getFileById(parentId);
+
+    if (parentId === 0 || file.length === 0) {
+      const files = await dbClient.getAllFiles();
+      const outputList = [];
+
+      files.forEach((file) => {
+        outputList.push({
+          id: file._id,
+          userId: file.userId,
+          name: file.name,
+          type: file.type,
+          isPublic: file.isPublic,
+          parentId: file.parentId,
+        });
+      });
+
+      return response.status(200).json(outputList);
+    }
+    if (parentId) {
+      const files = await dbClient.getAllFilesById(parentId);
+      const outputList = [];
+
+      files.forEach((file) => {
+        outputList.push({
+          id: file._id,
+          userId: file.userId,
+          name: file.name,
+          type: file.type,
+          isPublic: file.isPublic,
+          parentId: file.parentId,
+        });
+      });
+      return response.status(200).json(outputList);
+    }
+
+    return response.status(200).json({});
   }
 }
 
